@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"microservies/handlers"
+	handlers2 "microservies/product-api/handlers"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,13 +11,12 @@ import (
 )
 
 func main() {
+
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	hel := handlers.NewHello(l)
-	godbye := handlers.NewGoodbye(l)
+	pr := handlers2.NewProducts(l)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", hel)
-	sm.Handle("/goodbye", godbye)
+	sm.Handle("/", pr)
 
 	s := &http.Server{
 		Addr:         ":8080",
