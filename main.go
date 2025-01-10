@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/gorilla/mux"
 	"log"
 	handlers2 "microservies/product-api/handlers"
 	"net/http"
@@ -15,7 +16,7 @@ func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 	pr := handlers2.NewProducts(l)
 
-	sm := http.NewServeMux()
+	sm := mux.NewRouter()
 	sm.Handle("/", pr)
 
 	s := &http.Server{
