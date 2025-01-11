@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
@@ -23,17 +24,14 @@ func (p *Products) UpdateProduct(rw http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(rw, "Could not convert id", http.StatusBadRequest)
+		return
 	}
 
 	p.l.Println("Handle PUT product", id)
-	prod := &data.Product{}
+	prod := r.Context().Value(KeyProduct{}).(data.Product)
 
-	err = prod.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-	}
 	p.l.Printf("Added product %#v", prod)
-	err = data.UpdateProduct(id, prod)
+	err = data.UpdateProduct(id, &prod)
 	if err == data.ErrProductNotFound {
 		http.Error(rw, "Product not found", http.StatusNotFound)
 		return
@@ -46,16 +44,11 @@ func (p *Products) UpdateProduct(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-func (p *Products) addProduct(rw http.ResponseWriter, r *http.Request) {
+func (p *Products) AddProduct(rw http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle Post product")
-	prod := &data.Product{}
 
-	err := prod.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-	}
-	p.l.Printf("Added product %#v", prod)
-	data.AddProduct(prod)
+	prod := r.Context().Value(KeyProduct{}).(data.Product)
+	data.AddProduct(&prod)
 }
 
 func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
@@ -65,4 +58,24 @@ func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
 
 		http.Error(rw, "Error marshalling products.", http.StatusInternalServerError)
 	}
+}
+
+type KeyProduct struct {
+}
+
+func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		prod := &data.Product{}
+
+		err := prod.FromJSON(r.Body)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), KeyProduct{}, prod)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(rw, r)
+	})
 }
