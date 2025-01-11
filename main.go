@@ -22,13 +22,13 @@ func main() {
 	getRouter.HandleFunc("/", pr.GetProducts)
 
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", pr.UpdateProduct)
-	putRouter.Use(pr.MiddlewareProductValidation)
+	putRouter.HandleFunc("/{id:[0-9]+}", pr.UpdateProducts)
+	putRouter.Use(pr.MiddlewareValidateProduct)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", pr.AddProduct)
-	postRouter.Use(pr.MiddlewareProductValidation)
-	
+	postRouter.Use(pr.MiddlewareValidateProduct)
+
 	s := &http.Server{
 		Addr:         ":8080",
 		Handler:      sm,
