@@ -1,10 +1,25 @@
+// Package classification of Product API
+//
+// # Documentation for Product API
+//
+// Schemes: http
+// BasicPath: /
+// Version 1.0.0
+//
+// Consumes :
+// -consume application/JSON
+// 	Produces :
+//	- application/JSON
+//  swagger: meta
+
 package handlers
 
 import (
 	"context"
 	"fmt"
 	"log"
-	"microservies/product-api/data"
+	"microservies/data"
+
 	"net/http"
 	"strconv"
 

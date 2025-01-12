@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"log"
-	handlers2 "microservies/product-api/handlers"
+	"microservies/handlers"
+
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +15,7 @@ import (
 func main() {
 
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	pr := handlers2.NewProducts(l)
+	pr := handlers.NewProducts(l)
 
 	sm := mux.NewRouter()
 
